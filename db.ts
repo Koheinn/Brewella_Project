@@ -168,35 +168,55 @@ if (usersCount.count === 0) {
 
   const insertMenu = db.prepare('INSERT INTO menus (menu_id, menu_name, menu_image_path, menu_description, menu_price, uploaded_user_id) VALUES (?, ?, ?, ?, ?, ?)');
   const insertMenuTx = db.transaction(() => {
-    insertMenu.run(1, 'Espresso', '', 'A bold, concentrated shot of pure coffee ☕🔥, crafted to deliver maximum flavor and energy in a tiny cup. Perfect for true coffee lovers who crave intensity.', 5600, 1);
-    insertMenu.run(2, 'Americano', '', 'Smooth and balanced 🌊☕, made by blending rich espresso with hot water. Ideal for those who enjoy a lighter but full-bodied coffee.', 6600, 1);
-    insertMenu.run(3, 'Cappuccino', '', 'A delightful harmony 🎶 of strong espresso, creamy steamed milk, and airy milk foam ☁️. Topped with a sprinkle of cocoa or cinnamon for a cozy treat.', 6600, 1);
-    insertMenu.run(4, 'Latte', '', 'Silky and comforting 🥛☕, combining robust espresso with velvety steamed milk. A classic favorite for an all-day coffee fix.', 5000, 1);
-    insertMenu.run(5, 'Mocha', '', 'A chocolate lover’s dream 🍫☕, this drink blends espresso, steamed milk, and chocolate syrup, crowned with whipped cream for indulgence.', 6600, 1);
-    insertMenu.run(6, 'Flat White', '', 'Smooth and refined ✨, featuring a rich espresso base topped with micro-foam milk. A creamy but bold coffee experience.', 6600, 1);
-    insertMenu.run(7, 'Macchiato', '', 'Espresso “kissed” with just a touch of foamed milk 💋☕. Strong and simple, perfect for when you want coffee with a hint of softness.', 5000, 1);
-    insertMenu.run(8, 'Caramel Macchiato', '', 'A sweet classic 🍯☕, layering espresso, milk, and vanilla syrup, finished with golden caramel drizzle for a perfect balance.', 6000, 1);
-    insertMenu.run(9, 'Cold Brew', '', 'Slowly steeped in cold water for 12+ hours ❄️🥶, this coffee is smooth, low in acidity, and deeply refreshing. Great for hot days.', 6500, 1);
-    insertMenu.run(10, 'Iced Latte', '', 'Cool and creamy ❄️🥛☕, made with espresso poured over ice and topped with chilled milk. A refreshing twist on the classic latte.', 6800, 1);
-    insertMenu.run(11, 'Iced Mocha', '', 'Chocolatey and refreshing 🍫❄️☕, this iced delight mixes espresso, milk, and rich chocolate syrup for a sweet energy boost.', 7000, 1);
-    insertMenu.run(12, 'Matcha Latte', '', 'A vibrant green tea experience 🍵💚, blending ceremonial-grade matcha with steamed milk. Earthy, creamy, and antioxidant-rich.', 6600, 1);
-    insertMenu.run(13, 'Chai Latte', '', 'Warm and spiced 🌿🍂, this drink infuses black tea with cinnamon, cardamom, ginger, and milk for a comforting hug in a cup.', 6000, 1);
-    insertMenu.run(14, 'Hot Chocolate', '', 'Creamy, cozy, and sweet 🍫☁️, topped with whipped cream and maybe a sprinkle of cocoa. A nostalgic favorite for all ages.', 6000, 1);
-    insertMenu.run(15, 'Vanilla Latte', '', 'Smooth espresso paired with steamed milk 🌸☕, infused with fragrant vanilla syrup for a sweet and delicate flavor.', 6800, 1);
-    insertMenu.run(16, 'Hazelnut Latte', '', 'A nutty, aromatic twist 🌰☕, where espresso and steamed milk meet the sweetness of hazelnut syrup. Comfort in a cup.', 7000, 1);
-    insertMenu.run(17, 'Pumpkin Spice Latte', '', 'Autumn in a cup 🍁🎃☕, blending espresso, milk, and pumpkin spice flavors of cinnamon, nutmeg, and clove. A seasonal favorite!', 7000, 1);
-    insertMenu.run(18, 'Affogato', '', 'A luxurious dessert-drink 🍨☕, where hot espresso is poured over cold vanilla ice cream, creating a contrast of temperatures and flavors.', 7000, 1);
-    insertMenu.run(19, 'Croissant', '', 'Flaky, buttery, and golden 🥐✨, freshly baked every morning. Perfect on its own or paired with your favorite coffee.', 3000, 1);
-    insertMenu.run(20, 'Blueberry Muffin', '', 'Soft, moist, and bursting with blueberries 🫐🧁. A sweet bakery treat that pairs beautifully with a hot cup of coffee.', 4000, 1);
-    insertMenu.run(21, 'Strawberry Cheesecake', '', 'A creamy, dreamy dessert 🍓🍰✨ with a buttery graham cracker crust, rich cheesecake filling, and a luscious strawberry topping. Sweet, tangy, and indulgent — the perfect treat to enjoy alongside your favorite coffee.', 5500, 1);
-  });
+  insertMenu.run(1, 'Espresso', '/uploads/menu_68b598fc313871.14017674.webp', 'A bold, concentrated shot of pure coffee ☕🔥, crafted to deliver maximum flavor and energy in a tiny cup. Perfect for true coffee lovers who crave intensity.', 5600, 1);
+
+  insertMenu.run(2, 'Americano', '/uploads/menu_68b5904c0d6481.68441926.webp', 'Smooth and balanced 🌊☕, made by blending rich espresso with hot water. Ideal for those who enjoy a lighter but full-bodied coffee.', 6600, 1);
+
+  insertMenu.run(3, 'Cappuccino', '/uploads/menu_68b590b743fe21.80299345.avif', 'A delightful harmony 🎶 of strong espresso, creamy steamed milk, and airy milk foam ☁️. Topped with a sprinkle of cocoa or cinnamon for a cozy treat.', 6600, 1);
+
+  insertMenu.run(4, 'Latte', '/uploads/menu_68b5913e73c8b3.94614322.jpg', 'Silky and comforting 🥛☕, combining robust espresso with velvety steamed milk. A classic favorite for an all-day coffee fix.', 5000, 1);
+
+  insertMenu.run(5, 'Mocha', '/uploads/menu_68b591cc60a889.05071586.jpg', 'A chocolate lover’s dream 🍫☕, this drink blends espresso, steamed milk, and chocolate syrup, crowned with whipped cream for indulgence.', 6600, 1);
+
+  insertMenu.run(6, 'Flat White', '/uploads/menu_68b5924a581c41.77966709.jpg', 'Smooth and refined ✨, featuring a rich espresso base topped with micro-foam milk. A creamy but bold coffee experience.', 6600, 1);
+
+  insertMenu.run(7, 'Macchiato', '/uploads/menu_68b5930c5ff628.36110600.jpg', 'Espresso “kissed” with just a touch of foamed milk 💋☕. Strong and simple, perfect for when you want coffee with a hint of softness.', 5000, 1);
+
+  insertMenu.run(8, 'Caramel Macchiato', '/uploads/menu_68b5936d36d3f4.14739446.jpg', 'A sweet classic 🍯☕, layering espresso, milk, and vanilla syrup, finished with golden caramel drizzle for a perfect balance.', 6000, 1);
+
+  insertMenu.run(9, 'Cold Brew', '/uploads/menu_68b593cf5afe23.72928416.jpg', 'Slowly steeped in cold water for 12+ hours ❄️🥶, this coffee is smooth, low in acidity, and deeply refreshing. Great for hot days.', 6500, 1);
+
+  insertMenu.run(10, 'Iced Latte', '/uploads/menu_68b594297866e2.85244273.jpg', 'Cool and creamy ❄️🥛☕, made with espresso poured over ice and topped with chilled milk. A refreshing twist on the classic latte.', 6800, 1);
+
+  insertMenu.run(11, 'Iced Mocha', '/uploads/menu_68b59479b9ff59.15051332.jpg', 'Chocolatey and refreshing 🍫❄️☕, this iced delight mixes espresso, milk, and rich chocolate syrup for a sweet energy boost.', 7000, 1);
+
+  insertMenu.run(12, 'Matcha Latte', '/uploads/menu_68b594d653a3e9.59667344.jpg', 'A vibrant green tea experience 🍵💚, blending ceremonial-grade matcha with steamed milk. Earthy, creamy, and antioxidant-rich.', 6600, 1);
+
+  insertMenu.run(13, 'Chai Latte', '/uploads/menu_68b5952a858d08.98495470.jpg', 'Warm and spiced 🌿🍂, this drink infuses black tea with cinnamon, cardamom, ginger, and milk for a comforting hug in a cup.', 6000, 1);
+
+  insertMenu.run(14, 'Hot Chocolate', '/uploads/menu_68b5958a927eb5.47439770.jpg', 'Creamy, cozy, and sweet 🍫☁️, topped with whipped cream and maybe a sprinkle of cocoa. A nostalgic favorite for all ages.', 6000, 1);
+
+  insertMenu.run(15, 'Vanilla Latte', '/uploads/menu_68b5960eef2c70.68713644.webp', 'Smooth espresso paired with steamed milk 🌸☕, infused with fragrant vanilla syrup for a sweet and delicate flavor.', 6800, 1);
+
+  insertMenu.run(16, 'Hazelnut Latte', '/uploads/menu_68b5966f3e15f8.08545590.jpg', 'A nutty, aromatic twist 🌰☕, where espresso and steamed milk meet the sweetness of hazelnut syrup. Comfort in a cup.', 7000, 1);
+
+  insertMenu.run(17, 'Pumpkin Spice Latte', '/uploads/menu_68b596bfad9fc8.86777440.jpg', 'Autumn in a cup 🍁🎃☕, blending espresso, milk, and pumpkin spice flavors of cinnamon, nutmeg, and clove. A seasonal favorite!', 7000, 1);
+
+  insertMenu.run(18, 'Affogato', '/uploads/menu_68b5971ac52384.84131873.jpg', 'A luxurious dessert-drink 🍨☕, where hot espresso is poured over cold vanilla ice cream, creating a contrast of temperatures and flavors.', 7000, 1);
+
+  insertMenu.run(19, 'Croissant', '/uploads/menu_68b59770944412.74320031.webp', 'Flaky, buttery, and golden 🥐✨, freshly baked every morning. Perfect on its own or paired with your favorite coffee.', 3000, 1);
+
+  insertMenu.run(20, 'Blueberry Muffin', '/uploads/menu_68b597de628ff0.20541456.jpg', 'Soft, moist, and bursting with blueberries 🫐🧁. A sweet bakery treat that pairs beautifully with a hot cup of coffee.', 4000, 1);
+
+  insertMenu.run(21, 'Strawberry Cheesecake', '/uploads/menu_68b59c3260a878.30474550.jpg', 'A creamy, dreamy dessert 🍓🍰✨ with a buttery graham cracker crust, rich cheesecake filling, and a luscious strawberry topping.', 5500, 1);
+});
   insertMenuTx();
 
   const insertPost = db.prepare('INSERT INTO posts (post_id, user_id, title, content, image_path, post_type, status) VALUES (?, ?, ?, ?, ?, ?, ?)');
   const insertPostTx = db.transaction(() => {
-    insertPost.run(1, 1, '☕ Myanmar Coffee & Culture Night', '🌿 Event Highlights\r\n\r\nSpecial Menu for the Night\r\n\r\nBurmese Coffee (လက်ဖက်ရည်ကြမ်း စတိုင်) – Rich, sweet, and creamy coffee with condensed milk.\r\n\r\nLaphet Yay (လက်ဖက်ရည်) – Traditional Burmese milk tea.\r\n\r\nShan-style snacks – Like tofu fritters, mont lone yay paw (sweet glutinous rice balls), and samosas.\r\n\r\nBurmese Dessert Corner – Mont pyar tha let (pancakes), mont lone yay paw, or coconut jelly.\r\n\r\nCultural Touch\r\n\r\nSoft background Burmese acoustic music 🎶.\r\n\r\nDecorations with thanaka patterns, lotus flowers, and traditional fabrics.\r\n\r\nOptional: Invite a local Burmese acoustic guitarist or harp (saung) player.\r\n\r\nInteractive Segment\r\n\r\nCoffee Tasting Flight – Let guests try different Myanmar coffee beans (Shan, Chin, Mandalay regions).\r\n\r\nMini Workshop – Teach how to brew Burmese-style sweet coffee or laphet yay.\r\n\r\nPhoto Corner – Traditional parasols (ထီး), longyi patterns, and tea baskets for fun pictures.\r\n\r\nCommunity Activity\r\n\r\nDonation box for a local Myanmar cause (education, farmers, or coffee growers).\r\n\r\nShowcase artwork or crafts from Burmese artists.\r\n\r\n📅 Suggested Timing:\r\n\r\nEvening (6 PM – 9 PM) for a relaxed, cultural vibe.\r\n\r\nCan be monthly or once every two months as a themed event.', '', 'event', 'published');
-    insertPost.run(2, 2, 'New Autumn Menu ❄️⛄', '🍂 New on the Menu: Hazelnut Latte 🌰☕\r\n\r\nFall just got a little toastier! Introducing our Hazelnut Latte – smooth espresso, steamed milk, and rich, nutty hazelnut syrup topped with a warm sprinkle of cinnamon. It’s the hug-in-a-mug you’ve been waiting for. 💛\r\n\r\nSwing by Brewella and sip into the season. Available hot or iced — because autumn weather likes to keep us guessing. 😉\r\n\r\n#BrewellaCafe #HazelnutLatte #FallFlavors #AutumnVibes #CoffeeSeason', '', 'news', 'published');
-    insertPost.run(3, 2, '📖☕ Study & Sip at Brewella', 'Need a productive space with great coffee? Brewella is hosting a Study & Sip session!\r\n\r\nEnjoy a quiet, cozy environment, free WiFi, and special student discounts on selected drinks.\r\n\r\nBring your laptop, your notes, and let Brewella fuel your focus.', '', 'news', 'published');
+    insertPost.run(1, 1, '☕ Myanmar Coffee & Culture Night', '🌿 Event Highlights\r\n\r\nSpecial Menu for the Night\r\n\r\nBurmese Coffee (လက်ဖက်ရည်ကြမ်း စတိုင်) – Rich, sweet, and creamy coffee with condensed milk.\r\n\r\nLaphet Yay (လက်ဖက်ရည်) – Traditional Burmese milk tea.\r\n\r\nShan-style snacks – Like tofu fritters, mont lone yay paw (sweet glutinous rice balls), and samosas.\r\n\r\nBurmese Dessert Corner – Mont pyar tha let (pancakes), mont lone yay paw, or coconut jelly.\r\n\r\nCultural Touch\r\n\r\nSoft background Burmese acoustic music 🎶.\r\n\r\nDecorations with thanaka patterns, lotus flowers, and traditional fabrics.\r\n\r\nOptional: Invite a local Burmese acoustic guitarist or harp (saung) player.\r\n\r\nInteractive Segment\r\n\r\nCoffee Tasting Flight – Let guests try different Myanmar coffee beans (Shan, Chin, Mandalay regions).\r\n\r\nMini Workshop – Teach how to brew Burmese-style sweet coffee or laphet yay.\r\n\r\nPhoto Corner – Traditional parasols (ထီး), longyi patterns, and tea baskets for fun pictures.\r\n\r\nCommunity Activity\r\n\r\nDonation box for a local Myanmar cause (education, farmers, or coffee growers).\r\n\r\nShowcase artwork or crafts from Burmese artists.\r\n\r\n📅 Suggested Timing:\r\n\r\nEvening (6 PM – 9 PM) for a relaxed, cultural vibe.\r\n\r\nCan be monthly or once every two months as a themed event.', '/uploads/post_68c814109e829.jpg', 'event', 'published');
+    insertPost.run(2, 2, 'New Autumn Menu ❄️⛄', '🍂 New on the Menu: Hazelnut Latte 🌰☕\r\n\r\nFall just got a little toastier! Introducing our Hazelnut Latte – smooth espresso, steamed milk, and rich, nutty hazelnut syrup topped with a warm sprinkle of cinnamon. It’s the hug-in-a-mug you’ve been waiting for. 💛\r\n\r\nSwing by Brewella and sip into the season. Available hot or iced — because autumn weather likes to keep us guessing. 😉\r\n\r\n#BrewellaCafe #HazelnutLatte #FallFlavors #AutumnVibes #CoffeeSeason', '/uploads/post_68f0e35918822.jpg', 'news', 'published');
+    insertPost.run(3, 2, '📖☕ Study & Sip at Brewella', 'Need a productive space with great coffee? Brewella is hosting a Study & Sip session!\r\n\r\nEnjoy a quiet, cozy environment, free WiFi, and special student discounts on selected drinks.\r\n\r\nBring your laptop, your notes, and let Brewella fuel your focus.', '/uploads/post_69a69d442f1f3.webp', 'news', 'published');
   });
   insertPostTx();
 

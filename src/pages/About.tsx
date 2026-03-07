@@ -112,7 +112,7 @@ export default function About() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
             {[
               { name: "Elena Rodriguez", role: "Head Barista", img: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" },
-              { name: "Marcus Johnson", role: "Pastry Chef", img: "https://images.unsplash.com/photo-1583394838336-acd977736f90?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" },
+              { name: "Marcus Johnson", role: "Pastry Chef", img: "https://images.unsplash.com/photo-1627161683077-e34782c24d81?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" },
               { name: "Sarah Williams", role: "Store Manager", img: "https://images.unsplash.com/photo-1580489944761-15a19d654956?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" }
             ].map((member, i) => (
               <motion.div 
