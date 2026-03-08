@@ -22,11 +22,14 @@ export default function AdminPosts() {
   const [loading, setLoading] = useState(true);
   const { token } = useAuth();
   const [isAdding, setIsAdding] = useState(false);
+  const [editingPost, setEditingPost] = useState<Post | null>(null);
+  const [imageFile, setImageFile] = useState<File | null>(null);
   const [formData, setFormData] = useState({
     title: '',
     content: '',
     post_type: 'news',
-    status: 'published'
+    status: 'published',
+    existing_image: ''
   });
 
   const fetchPosts = async () => {
@@ -53,27 +56,54 @@ export default function AdminPosts() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const res = await fetch('/api/admin/posts', {
-        method: 'POST',
+      const formDataToSend = new FormData();
+      formDataToSend.append('title', formData.title);
+      formDataToSend.append('content', formData.content);
+      formDataToSend.append('post_type', formData.post_type);
+      formDataToSend.append('status', formData.status);
+      if (imageFile) {
+        formDataToSend.append('image', imageFile);
+      } else if (editingPost) {
+        formDataToSend.append('existing_image', formData.existing_image);
+      }
+
+      const url = editingPost ? `/api/admin/posts/${editingPost.post_id}` : '/api/admin/posts';
+      const method = editingPost ? 'PUT' : 'POST';
+      const res = await fetch(url, {
+        method,
         headers: {
-          'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify(formData)
+        body: formDataToSend
       });
 
       if (res.ok) {
-        toast.success('Post created successfully');
+        toast.success(`Post ${editingPost ? 'updated' : 'created'} successfully`);
         setIsAdding(false);
-        setFormData({ title: '', content: '', post_type: 'news', status: 'published' });
+        setEditingPost(null);
+        setFormData({ title: '', content: '', post_type: 'news', status: 'published', existing_image: '' });
+        setImageFile(null);
         fetchPosts();
       } else {
-        toast.error('Failed to create post');
+        toast.error('Failed to save post');
       }
     } catch (error) {
-      console.error('Error creating post:', error);
-      toast.error('Failed to create post');
+      console.error('Error saving post:', error);
+      toast.error('Failed to save post');
     }
+  };
+
+  const editPost = (post: Post) => {
+    setEditingPost(post);
+    setFormData({ 
+      title: post.title, 
+      content: post.content, 
+      post_type: post.post_type, 
+      status: post.status,
+      existing_image: post.image_path 
+    });
+    setImageFile(null);
+    setIsAdding(true);
   };
 
   const handleDelete = async (id: number) => {
@@ -103,7 +133,7 @@ export default function AdminPosts() {
           <p className="text-stone-600">Manage posts and announcements.</p>
         </div>
         <button
-          onClick={() => setIsAdding(!isAdding)}
+          onClick={() => { setIsAdding(!isAdding); setEditingPost(null); setFormData({ title: '', content: '', post_type: 'news', status: 'published', existing_image: '' }); setImageFile(null); }}
           className="bg-amber-600 text-white px-4 py-2 rounded-xl hover:bg-amber-700 transition-colors flex items-center gap-2"
         >
           {isAdding ? 'Cancel' : <><Plus className="h-5 w-5" /> Add Post</>}
@@ -112,7 +142,7 @@ export default function AdminPosts() {
 
       {isAdding && (
         <div className="bg-white p-6 rounded-2xl shadow-sm border border-stone-100 mb-8">
-          <h2 className="text-xl font-bold text-stone-900 mb-4">Add New Post</h2>
+          <h2 className="text-xl font-bold text-stone-900 mb-4">{editingPost ? 'Edit' : 'Add New'} Post</h2>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-stone-700 mb-1">Title</label>
@@ -133,6 +163,18 @@ export default function AdminPosts() {
                 onChange={(e) => setFormData({...formData, content: e.target.value})}
                 className="w-full px-4 py-2 rounded-xl border border-stone-200 focus:outline-none focus:ring-2 focus:ring-amber-500"
               />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-stone-700 mb-1">Image</label>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={(e) => setImageFile(e.target.files?.[0] || null)}
+                className="w-full px-4 py-2 rounded-xl border border-stone-200 focus:outline-none focus:ring-2 focus:ring-amber-500"
+              />
+              {editingPost && formData.existing_image && !imageFile && (
+                <div className="mt-2 text-sm text-stone-600">Current: {formData.existing_image}</div>
+              )}
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
@@ -220,13 +262,22 @@ export default function AdminPosts() {
                       {format(new Date(post.created_at), 'MMM d, yyyy')}
                     </td>
                     <td className="p-4 text-right">
-                      <button 
-                        onClick={() => handleDelete(post.post_id)}
-                        className="text-red-500 hover:text-red-700 transition-colors p-2"
-                        title="Delete Post"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </button>
+                      <div className="flex justify-end gap-2">
+                        <button 
+                          onClick={() => editPost(post)}
+                          className="text-blue-500 hover:text-blue-700 transition-colors p-2"
+                          title="Edit Post"
+                        >
+                          <Edit className="h-4 w-4" />
+                        </button>
+                        <button 
+                          onClick={() => handleDelete(post.post_id)}
+                          className="text-red-500 hover:text-red-700 transition-colors p-2"
+                          title="Delete Post"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))

@@ -18,6 +18,8 @@ export default function BookTable() {
   const [tables, setTables] = useState<CafeTable[]>([]);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  const [settings, setSettings] = useState({ opening_time: '08:00', closing_time: '22:00', shop_status: 'open' });
+  const [bookedTableIds, setBookedTableIds] = useState<number[]>([]);
 
   const [formData, setFormData] = useState({
     table_id: '',
@@ -41,7 +43,21 @@ export default function BookTable() {
         console.error('Error fetching tables:', err);
         setLoading(false);
       });
+    
+    fetch('/api/settings')
+      .then(res => res.json())
+      .then(data => setSettings(data))
+      .catch(err => console.error('Error fetching settings:', err));
   }, []);
+
+  useEffect(() => {
+    if (formData.booking_date) {
+      fetch(`/api/bookings/available/${formData.booking_date}`)
+        .then(res => res.json())
+        .then(data => setBookedTableIds(data))
+        .catch(err => console.error('Error fetching booked tables:', err));
+    }
+  }, [formData.booking_date]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -54,6 +70,33 @@ export default function BookTable() {
       toast.error('Please login to book a table');
       navigate('/login', { state: { from: '/book-table' } });
       return;
+    }
+
+    if (settings.shop_status === 'closed') {
+      toast.error('Sorry, the shop is currently closed for bookings');
+      return;
+    }
+
+    const now = new Date();
+    const currentTime = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+    const bookingDate = new Date(formData.booking_date);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    bookingDate.setHours(0, 0, 0, 0);
+
+    if (bookingDate.getTime() === today.getTime()) {
+      if (currentTime < settings.opening_time) {
+        toast.error(`Bookings start at ${settings.opening_time}`);
+        return;
+      }
+      if (currentTime > settings.closing_time) {
+        toast.error('Shop is closed for today');
+        return;
+      }
+      if (formData.booking_time < currentTime) {
+        toast.error('Cannot book a time in the past');
+        return;
+      }
     }
 
     setSubmitting(true);
@@ -80,6 +123,22 @@ export default function BookTable() {
       setSubmitting(false);
     }
   };
+
+  const getMinTime = () => {
+    const bookingDate = new Date(formData.booking_date);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    bookingDate.setHours(0, 0, 0, 0);
+    
+    if (bookingDate.getTime() === today.getTime()) {
+      const now = new Date();
+      const currentTime = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+      return currentTime > settings.opening_time ? currentTime : settings.opening_time;
+    }
+    return settings.opening_time;
+  };
+
+  const isBookingDisabled = settings.shop_status === 'closed';
 
   // Get unique areas for filtering
   const areas = Array.from(new Set(tables.map(t => t.area)));
@@ -109,6 +168,11 @@ export default function BookTable() {
             transition={{ duration: 0.5 }}
             className="lg:col-span-8 bg-white p-8 rounded-3xl shadow-sm border border-stone-100"
           >
+            {isBookingDisabled && (
+              <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl text-red-700 text-center">
+                <strong>Shop is currently closed.</strong> Bookings are temporarily unavailable.
+              </div>
+            )}
             <form onSubmit={handleSubmit} className="space-y-8">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 
@@ -204,11 +268,12 @@ export default function BookTable() {
                           type="time"
                           name="booking_time"
                           required
-                          min="08:00"
-                          max="22:00"
+                          min={getMinTime()}
+                          max={settings.closing_time}
                           value={formData.booking_time}
                           onChange={handleChange}
-                          className="pl-10 w-full rounded-xl border-stone-300 shadow-sm focus:ring-amber-500 focus:border-amber-500 py-3 bg-stone-50"
+                          disabled={isBookingDisabled}
+                          className="pl-10 w-full rounded-xl border-stone-300 shadow-sm focus:ring-amber-500 focus:border-amber-500 py-3 bg-stone-50 disabled:opacity-50"
                         />
                       </div>
                     </div>
@@ -243,7 +308,8 @@ export default function BookTable() {
                         required
                         value={formData.table_id}
                         onChange={handleChange}
-                        className="pl-10 w-full rounded-xl border-stone-300 shadow-sm focus:ring-amber-500 focus:border-amber-500 py-3 bg-stone-50 appearance-none"
+                        disabled={isBookingDisabled}
+                        className="pl-10 w-full rounded-xl border-stone-300 shadow-sm focus:ring-amber-500 focus:border-amber-500 py-3 bg-stone-50 appearance-none disabled:opacity-50"
                       >
                         <option value="" disabled>Choose a table...</option>
                         {loading ? (
@@ -251,11 +317,15 @@ export default function BookTable() {
                         ) : (
                           areas.map(area => (
                             <optgroup key={area} label={area}>
-                              {tables.filter(t => t.area === area).map(table => (
-                                <option key={table.table_id} value={table.table_id} disabled={table.capacity < formData.guest_count}>
-                                  Table {table.table_number} (Capacity: {table.capacity}) {table.capacity < formData.guest_count ? '- Too small' : ''}
-                                </option>
-                              ))}
+                              {tables.filter(t => t.area === area).map(table => {
+                                const isBooked = bookedTableIds.includes(table.table_id);
+                                const isTooSmall = table.capacity < formData.guest_count;
+                                return (
+                                  <option key={table.table_id} value={table.table_id} disabled={isTooSmall || isBooked}>
+                                    Table {table.table_number} (Capacity: {table.capacity}) {isTooSmall ? '- Too small' : isBooked ? '- Already booked' : ''}
+                                  </option>
+                                );
+                              })}
                             </optgroup>
                           ))
                         )}
@@ -286,10 +356,10 @@ export default function BookTable() {
               <div className="pt-4">
                 <button
                   type="submit"
-                  disabled={submitting}
-                  className="w-full flex justify-center py-4 px-4 border border-transparent rounded-xl shadow-sm text-lg font-medium text-white bg-amber-600 hover:bg-amber-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 transition-colors disabled:opacity-70"
+                  disabled={submitting || isBookingDisabled}
+                  className="w-full flex justify-center py-4 px-4 border border-transparent rounded-xl shadow-sm text-lg font-medium text-white bg-amber-600 hover:bg-amber-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 transition-colors disabled:opacity-70 disabled:cursor-not-allowed"
                 >
-                  {submitting ? 'Confirming Reservation...' : 'Confirm Reservation'}
+                  {submitting ? 'Confirming Reservation...' : isBookingDisabled ? 'Booking Unavailable' : 'Confirm Reservation'}
                 </button>
                 {!user && (
                   <p className="text-center text-sm text-stone-500 mt-4">

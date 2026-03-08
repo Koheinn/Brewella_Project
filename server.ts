@@ -136,6 +136,37 @@ async function startServer() {
     }
   });
 
+  // Tables CRUD
+  app.post('/api/admin/tables', authenticate, requireAdmin, (req: any, res) => {
+    const { table_number, capacity, area } = req.body;
+    try {
+      const insert = db.prepare('INSERT INTO cafe_tables (table_number, capacity, area) VALUES (?, ?, ?)');
+      insert.run(table_number, capacity, area);
+      res.json({ success: true });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.put('/api/admin/tables/:id', authenticate, requireAdmin, (req, res) => {
+    const { table_number, capacity, area } = req.body;
+    try {
+      db.prepare('UPDATE cafe_tables SET table_number = ?, capacity = ?, area = ? WHERE table_id = ?').run(table_number, capacity, area, req.params.id);
+      res.json({ success: true });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.delete('/api/admin/tables/:id', authenticate, requireAdmin, (req, res) => {
+    try {
+      db.prepare('DELETE FROM cafe_tables WHERE table_id = ?').run(req.params.id);
+      res.json({ success: true });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
   // Bookings
   app.get('/api/tables', (req, res) => {
     try {
@@ -149,9 +180,31 @@ async function startServer() {
   app.post('/api/bookings', authenticate, (req: any, res) => {
     const { table_id, booking_date, booking_time, guest_count, customer_name, customer_phone, customer_email, special_request } = req.body;
     try {
+      const existing = db.prepare(`
+        SELECT * FROM bookings 
+        WHERE table_id = ? AND booking_date = ? 
+        AND status NOT IN ('Cancelled', 'Completed')
+      `).get(table_id, booking_date);
+      
+      if (existing) {
+        return res.status(400).json({ error: 'This table is already booked for the selected date' });
+      }
+      
       const insert = db.prepare('INSERT INTO bookings (user_id, table_id, booking_date, booking_time, guest_count, customer_name, customer_phone, customer_email, special_request) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)');
       insert.run(req.user.user_id, table_id, booking_date, booking_time, guest_count, customer_name, customer_phone, customer_email, special_request);
       res.json({ success: true });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.get('/api/bookings/available/:date', (req, res) => {
+    try {
+      const bookedTables = db.prepare(`
+        SELECT table_id FROM bookings 
+        WHERE booking_date = ? AND status NOT IN ('Cancelled', 'Completed')
+      `).all(req.params.date);
+      res.json(bookedTables.map((b: any) => b.table_id));
     } catch (error: any) {
       res.status(500).json({ error: error.message });
     }
@@ -219,6 +272,7 @@ async function startServer() {
           (SELECT reaction_type FROM post_reactions WHERE post_id = p.post_id AND user_id = ?) as user_reaction
         FROM posts p 
         JOIN users u ON p.user_id = u.user_id 
+        WHERE p.status = 'published'
         ORDER BY p.created_at DESC
       `).all(userId);
       res.json(posts);
@@ -297,11 +351,23 @@ async function startServer() {
     }
   });
 
-  app.post('/api/admin/posts', authenticate, requireAdmin, (req: any, res) => {
+  app.post('/api/admin/posts', authenticate, requireAdmin, upload.single('image'), (req: any, res) => {
     const { title, content, post_type, status } = req.body;
+    const imagePath = req.file ? '/uploads/' + req.file.filename : '';
     try {
-      const insert = db.prepare('INSERT INTO posts (user_id, title, content, post_type, status) VALUES (?, ?, ?, ?, ?)');
-      insert.run(req.user.user_id, title, content, post_type, status);
+      const insert = db.prepare('INSERT INTO posts (user_id, title, content, image_path, post_type, status) VALUES (?, ?, ?, ?, ?, ?)');
+      insert.run(req.user.user_id, title, content, imagePath, post_type, status);
+      res.json({ success: true });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.put('/api/admin/posts/:id', authenticate, requireAdmin, upload.single('image'), (req: any, res) => {
+    const { title, content, post_type, status } = req.body;
+    const imagePath = req.file ? '/uploads/' + req.file.filename : req.body.existing_image;
+    try {
+      db.prepare('UPDATE posts SET title = ?, content = ?, image_path = ?, post_type = ?, status = ? WHERE post_id = ?').run(title, content, imagePath, post_type, status, req.params.id);
       res.json({ success: true });
     } catch (error: any) {
       res.status(500).json({ error: error.message });
@@ -425,6 +491,18 @@ async function startServer() {
         return acc;
       }, {});
       res.json(settingsObj);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.put('/api/admin/settings', authenticate, requireAdmin, (req, res) => {
+    const { opening_time, closing_time, shop_status } = req.body;
+    try {
+      if (opening_time) db.prepare('UPDATE shop_settings SET setting_value = ? WHERE setting_key = ?').run(opening_time, 'opening_time');
+      if (closing_time) db.prepare('UPDATE shop_settings SET setting_value = ? WHERE setting_key = ?').run(closing_time, 'closing_time');
+      if (shop_status) db.prepare('UPDATE shop_settings SET setting_value = ? WHERE setting_key = ?').run(shop_status, 'shop_status');
+      res.json({ success: true });
     } catch (error: any) {
       res.status(500).json({ error: error.message });
     }

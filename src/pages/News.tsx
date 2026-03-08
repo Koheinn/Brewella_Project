@@ -226,9 +226,11 @@ export default function News() {
                     {post.title}
                   </h2>
                   
-                  <p className="text-stone-600 mb-6 line-clamp-3 flex-grow">
-                    {post.content}
-                  </p>
+                  <div className="text-stone-600 mb-6 flex-grow">
+                    <p className={expandedPostId === post.post_id ? "whitespace-pre-wrap max-h-60 overflow-y-auto pr-2" : "line-clamp-3"}>
+                      {post.content}
+                    </p>
+                  </div>
                   
                   <div className="flex items-center justify-between mt-auto pt-6 border-t border-stone-100">
                     <button 

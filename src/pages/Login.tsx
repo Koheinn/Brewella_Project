@@ -105,24 +105,16 @@ export default function Login() {
             </div>
           </div>
 
-          <div className="flex items-center justify-between">
-            <div className="flex items-center">
-              <input
-                id="remember-me"
-                name="remember-me"
-                type="checkbox"
-                className="h-4 w-4 text-amber-600 focus:ring-amber-500 border-stone-300 rounded"
-              />
-              <label htmlFor="remember-me" className="ml-2 block text-sm text-stone-900">
-                Remember me
-              </label>
-            </div>
-
-            <div className="text-sm">
-              <a href="#" className="font-medium text-amber-600 hover:text-amber-500">
-                Forgot your password?
-              </a>
-            </div>
+          <div className="flex items-center">
+            <input
+              id="remember-me"
+              name="remember-me"
+              type="checkbox"
+              className="h-4 w-4 text-amber-600 focus:ring-amber-500 border-stone-300 rounded"
+            />
+            <label htmlFor="remember-me" className="ml-2 block text-sm text-stone-900">
+              Remember me
+            </label>
           </div>
 
           <div>

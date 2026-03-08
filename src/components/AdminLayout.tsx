@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Navigate, Link, Outlet, useLocation } from 'react-router-dom';
-import { Users, Coffee, Calendar, AlertCircle, LayoutDashboard, FileText } from 'lucide-react';
+import { Users, Coffee, Calendar, AlertCircle, LayoutDashboard, FileText, ArrowLeft } from 'lucide-react';
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
@@ -27,6 +27,13 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           <h2 className="text-2xl font-serif font-bold text-amber-500">Admin Panel</h2>
         </div>
         <nav className="flex-1 px-4 py-6 space-y-2">
+          <Link
+            to="/"
+            className="flex items-center gap-3 px-4 py-3 rounded-xl transition-colors text-stone-300 hover:bg-stone-800 hover:text-white mb-4 border-b border-stone-800 pb-4"
+          >
+            <ArrowLeft className="h-5 w-5" />
+            Back to Home
+          </Link>
           {navigation.map((item) => {
             const isActive = location.pathname === item.href;
             return (

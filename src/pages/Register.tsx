@@ -27,6 +27,12 @@ export default function Register() {
       return;
     }
 
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d]).{8,}$/;
+    if (!passwordRegex.test(formData.password)) {
+      toast.error('Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, a number and a symbol.');
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -150,13 +156,14 @@ export default function Register() {
                   type="password"
                   name="password"
                   required
-                  minLength={6}
+                  minLength={8}
                   value={formData.password}
                   onChange={handleChange}
                   className="pl-10 w-full rounded-xl border-stone-300 shadow-sm focus:ring-amber-500 focus:border-amber-500 py-3 bg-stone-50"
                   placeholder="••••••••"
                 />
               </div>
+              <p className="mt-1 text-xs text-stone-500">Must be 8+ characters with uppercase, lowercase, number and symbol</p>
             </div>
 
             <div>
@@ -169,7 +176,7 @@ export default function Register() {
                   type="password"
                   name="confirm_password"
                   required
-                  minLength={6}
+                  minLength={8}
                   value={formData.confirm_password}
                   onChange={handleChange}
                   className="pl-10 w-full rounded-xl border-stone-300 shadow-sm focus:ring-amber-500 focus:border-amber-500 py-3 bg-stone-50"
