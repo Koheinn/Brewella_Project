@@ -4,6 +4,7 @@ Full‑stack TypeScript web app for Brewella — a small coffee shop with a cust
 
 This README has been updated to match the repository's actual structure and scripts.
 
+This project demo is live at Render: 👉 https://brewella-cafe.onrender.com
 ---
 
 ## Quick summary
