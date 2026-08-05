@@ -1,64 +1,39 @@
 # Brewella — Brewella Coffee Shop
 
-Full-stack website for Brewella Coffee Shop — an elegant, TypeScript-first web application showcasing the menu, store locations, ordering flow, and business information for a local coffee shop.
+Full‑stack TypeScript web app for Brewella — a small coffee shop with a customer storefront and admin interface for managing menu items, bookings, posts, and shop settings.
 
-A fast, accessible storefront and admin interface designed to make it easy for customers to explore the menu, place orders, and learn about Brewella.
-
----
-
-## Highlights
-
-- Built in TypeScript for end-to-end type safety
-- Clean responsive UI for desktop and mobile
-- Customer-facing storefront plus admin/management pages
-- Local development and production-ready deploy flows (Docker-ready)
+This README has been updated to match the repository's actual structure and scripts.
 
 ---
 
-## Tech stack
+## Quick summary
 
-- **Language:** TypeScript
-- **Framework / runtime:** Next.js (recommended) + Node.js API routes or Express
-- **Database:** PostgreSQL (or SQLite for local development)
-- **Notable libraries:** Prisma (ORM), Tailwind CSS (styling), React, NextAuth or JWT for auth
-
-Note: The repository is TypeScript-heavy; adjust the commands below to match the actual package scripts if they differ.
-
----
-
-## What’s in this repository
-
-Top-level overview (common layout for a full-stack TypeScript app):
-
-```
-README.md         # This file
-package.json      # npm/yarn scripts and dependencies
-tsconfig.json     # TypeScript config
-.env.example      # Example environment variables
-apps/             # Optional: frontend and backend apps (monorepo layout)
-  web/            # Next.js frontend (public, pages/app, components)
-  api/            # Express / Next API routes, business logic
-  admin/          # Optional admin interface
-prisma/           # Prisma schema & migrations (if used)
-public/           # Static assets and images
-src/              # Source files (if single-app layout)
-  client/         # UI and pages
-  server/         # API, services
-  shared/         # Types and utilities shared across client/server
-scripts/          # Utility scripts (migrations, seed, deploy helpers)
-docker/           # Dockerfile + compose files for local/production
-tests/            # Unit & integration tests
-```
-
-How it fits together: the frontend calls the backend API to fetch menu items, user orders, and location data. The backend persists data to a relational database and exposes authenticated endpoints for admin actions. Shared TypeScript types keep client and server in sync.
+- Language: TypeScript
+- Frontend: React + Vite
+- Backend: Express (single Node process running server.ts via `tsx` in development)
+- Database: SQLite (brewella.db included and auto-initialized)
+- File uploads: stored in the `uploads/` directory (created automatically)
+- Authentication: JWT-based (see notes below)
 
 ---
 
-## Quick start — run locally
+## Repository layout (top-level)
 
-These are the shortest-path instructions. If your repository uses a monorepo, run the commands inside the appropriate folder (e.g., `apps/web` or `apps/api`).
+- README.md
+- package.json        # npm scripts and dependencies
+- tsconfig.json       # TypeScript config
+- server.ts           # Express server and API routes
+- db.ts               # SQLite database initialization & seed data (brewella.db)
+- brewella.db         # Included SQLite database file (seeded)
+- .env.example        # Example environment variables
+- uploads/            # Runtime uploads (images), created at startup
+- src/                # UI / client source (React + Vite) if present
 
-1. Clone
+---
+
+## Install
+
+1. Clone the repo
 
 ```bash
 git clone https://github.com/Koheinn/Brewella_Project.git
@@ -68,121 +43,124 @@ cd Brewella_Project
 2. Install dependencies
 
 ```bash
-# using npm
+# npm
 npm install
 
-# or using pnpm
+# or pnpm
 pnpm install
 
-# or using yarn
+# or yarn
 yarn install
 ```
 
-3. Copy environment variables
+3. Copy environment file
 
 ```bash
 cp .env.example .env
-# then edit .env to add any secrets (database URL, API keys)
+# then edit .env if you need to provide keys (see notes below)
 ```
 
-Required environment variables (example names — update to match the project):
+Notes about environment and secrets
 
-- DATABASE_URL - Postgres connection string (postgres://user:pass@localhost:5432/brewella)
-- NEXT_PUBLIC_API_URL - Frontend base URL (for client-side calls)
-- JWT_SECRET - Secret for signing auth tokens (for admin auth)
-- STRIPE_SECRET_KEY - (optional) payment provider secret key
+- .env.example included keys used by AI Studio usage (GEMINI_API_KEY, APP_URL). The app in this repository currently uses a hard-coded JWT secret in `server.ts` (JWT_SECRET = 'brewella_secret_key_2026') and a fixed port (3000). For production you should:
+  - Replace the hard-coded JWT secret with a value loaded from process.env (e.g. JWT_SECRET) and keep it secret.
+  - Optionally change the server port in `server.ts` or modify the code to read `process.env.PORT`.
 
-4. Database: migrate and seed (if using Prisma)
+---
+
+## Available scripts
+
+These come directly from package.json:
+
+- `npm run dev` — start the server for development (runs `tsx server.ts`). The server will use Vite middleware (hot reload) when NODE_ENV !== 'production'.
+- `npm run build` — build the frontend with Vite (`vite build`). This generates `dist/`.
+- `npm run preview` — preview the frontend build (`vite preview`).
+- `npm run clean` — remove the `dist/` directory
+- `npm run lint` — run TypeScript type check (`tsc --noEmit`)
+
+Development (recommended)
 
 ```bash
-# prisma example
-npx prisma migrate dev --name init
-npx prisma db seed
-```
-
-5. Start in development
-
-```bash
-# single-app
 npm run dev
-
-# or monorepo: start server and web concurrently
-npm run dev:api
-npm run dev:web
+# open http://localhost:3000
 ```
 
-6. Open the app
+Production / serving a built frontend locally
 
-Visit http://localhost:3000 (or the port reported by the dev server).
-
----
-
-## Docker (optional)
-
-Build and run with Docker Compose (if docker/compose files are present):
+1. Build the frontend
 
 ```bash
-docker compose up --build
+npm run build
 ```
 
-This will start the app and a database container. Check `docker/` or `docker-compose.yml` for service names and ports.
+2. Start the server in production mode so it serves the `dist/` directory
 
----
-
-## Tests
-
-Run unit and integration tests (adapt to the actual test runner):
+On macOS / Linux:
 
 ```bash
-npm test
-# or
-npm run test:watch
+NODE_ENV=production npx tsx server.ts
 ```
+
+On Windows (PowerShell):
+
+```powershell
+$env:NODE_ENV = 'production'; npx tsx server.ts
+```
+
+(You can add a `start` script to package.json that sets NODE_ENV=production and runs `tsx server.ts`.)
 
 ---
 
-## Deployment
+## Database
 
-Typical deployment targets:
+This project uses SQLite via better-sqlite3. A file named `brewella.db` is included and `db.ts` contains schema creation and seed data. If you want a fresh database remove `brewella.db` and restart the server — the code will create and seed the DB automatically.
 
-- Vercel (recommended for Next.js frontends)
-- Railway / Render / Fly / DigitalOcean for full-stack deployments
-- Docker image to any container host or Kubernetes cluster
+If you prefer Postgres or another RDBMS you'll need to port `db.ts` and the queries accordingly.
 
-Add CI/CD to run tests and build before deployment. Include steps to run DB migrations on deploy (Prisma migrate, TypeORM migrations, or SQL scripts).
+---
+
+## Notable implementation details
+
+- Server entry: `server.ts` — Express API routes for auth, menu, bookings, posts, issues, admin endpoints, and settings.
+- Database: `db.ts` — creates tables (users, cafe_tables, bookings, menus, posts, comments, reactions, shop_settings) and seeds initial data when empty.
+- File uploads: handled with `multer` and served from `/uploads`.
+- Authentication: JWT tokens are signed/verified using a secret. Currently the secret is hard-coded; update this for production use.
+- Dev tool: `tsx` is used to run TypeScript directly during development.
+
+---
+
+## Running tests
+
+There are no automated tests included in this repository. The `lint` script runs TypeScript checks (`tsc --noEmit`). Add your preferred test runner and scripts if you want unit/integration tests.
+
+---
+
+## Docker
+
+There are no docker files in the repo at the time of writing. To containerize the app:
+
+- Build the frontend (`npm run build`) to produce `dist/`.
+- Run the Node server in production mode (serve `dist/`) and ensure `brewella.db` is writable by the container or mount a volume.
 
 ---
 
 ## Contributing
 
-We welcome contributions. Suggested workflow:
+Contributions are welcome. Suggested workflow:
 
 1. Fork the repo
-2. Create a feature branch: `git checkout -b feat/some-feature`
-3. Run tests and linting locally
-4. Open a pull request describing your changes
-
-Code style: TypeScript with ESLint and Prettier. Add or update tests when changing behavior.
-
----
-
-## Roadmap
-
-- Customer ordering & payments flow
-- Admin portal for menu & order management
-- Promotions, loyalty program, and analytics dashboards
-- Internationalization and accessibility audit
+2. Create a branch: `git checkout -b feat/my-change`
+3. Make changes and run `npm run lint`
+4. Open a PR describing the change
 
 ---
 
 ## License
 
-Add a LICENSE file to the repository and replace this with the correct license name. If you don’t have one yet, consider the MIT License for permissive use.
+Project includes a LICENSE file. Check `LICENSE` for the repository license.
 
 ---
 
 ## Contact
 
-Brewella project maintained by Koheinn — open issues or PRs for bugs, features, or questions.
-
-If you want me to tailor this README to the exact code (scripts, frameworks, and env vars detected in the repo), I can read the repository and update this file to match. Say “Inspect the repo and update README” and I will scan package.json, top-level directories, and representative source files and then commit a README that exactly matches the code.
+Maintained by Koheinn — open issues or PRs for bugs, features, or questions.
